@@ -1,0 +1,21 @@
+Licença ISC
+
+Direitos autorais (c) 2026 Lucide Icons e Colaboradores
+
+É concedida permissão para usar, copiar, modificar e/ou distribuir este software para qualquer finalidade, com ou sem custo, desde que o aviso de direitos autorais acima e este aviso de permissão apareçam em todas as cópias.
+
+O SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA" E O AUTOR SE EXIME DE TODAS AS GARANTIAS COM RELAÇÃO A ESTE SOFTWARE, INCLUINDO TODAS AS GARANTIAS IMPLÍCITAS DE COMERCIABILIDADE E ADEQUAÇÃO A UM FIM ESPECÍFICO. EM NENHUMA HIPÓTESE O AUTOR SERÁ RESPONSÁVEL POR QUAISQUER DANOS ESPECIAIS, DIRETOS, INDIRETOS OU CONSEQUENCIAIS, OU QUAISQUER DANOS RESULTANTES DA PERDA DE USO, DADOS OU LUCROS, SEJA EM UMA AÇÃO CONTRATUAL, POR NEGLIGÊNCIA OU OUTRO ATO ILÍCITO, DECORRENTE OU RELACIONADO AO USO OU DESEMPENHO DESTE SOFTWARE.
+
+Os seguintes ícones do Lucide são derivados do projeto Feather:
+
+airplay, círculo de alerta, octógono de alerta, triângulo de alerta, abertura, seta para baixo em círculo, seta para baixo à esquerda, seta para baixo à direita, seta para baixo, seta para a esquerda em círculo, seta para a esquerda, seta para a direita em círculo, seta para a direita, seta para cima em círculo, seta para cima à esquerda, seta para cima à direita, seta para cima, arroba, calendário, elenco, verificação, chevron para baixo, chevron para a esquerda, chevron para a direita, chevron para cima, chevrons para baixo, chevrons para a esquerda, chevrons para a direita, chevrons para cima, círculo, prancheta, relógio, código, colunas, comando, bússola, canto inferior esquerdo, canto inferior direito, canto inferior esquerdo, canto superior esquerdo, canto superior esquerdo, canto inferior direito, canto superior direito, canto superior esquerdo, canto superior direito, mira, banco de dados, círculo divisor, quadrado divisor, cifrão, download, link externo, pena, franzir a testa, cerquilha, fones de ouvido, círculo de ajuda, informação, itálico, chave, layout, boia salva-vidas, link 2, link, carregador, cadeado, entrar, sair, maximizar, tanto faz, minimizar, minimizar 2, círculo de menos, quadrado de menos, menos, monitor, lua, mais horizontal, mais vertical, mover, música, navegação 2, navegação, octógono, círculo de pausa, porcentagem, círculo de mais, quadrado de mais, mais, ligar/desligar, rádio, rss, pesquisa, servidor, compartilhar, sacola de compras, barra lateral, smartphone, sorriso, quadrado, mesa 2, tablet, alvo, terminal, lixeira 2, lixeira, triângulo, tv, tipo, upload, círculo em X, octógono em X, quadrado em X, X, zoom in, zoom out
+
+A Licença MIT (MIT) (para os ícones listados acima)
+
+Direitos autorais (c) 2013-presente Cole Bemis
+
+É concedida permissão, gratuitamente, a qualquer pessoa que obtenha uma cópia deste software e arquivos de documentação associados (o "Software"), para lidar com o Software sem restrições, incluindo, sem limitação, os direitos de usar, copiar, modificar, fundir, publicar, distribuir, sublicenciar e/ou vender cópias do Software, e para permitir que as pessoas a quem o Software for fornecido o façam, sujeitas às seguintes condições:
+
+O aviso de direitos autorais acima e este aviso de permissão devem ser incluídos em todas as cópias ou partes substanciais do Software.
+
+O SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIA DE QUALQUER TIPO, EXPRESSA OU IMPLÍCITA, INCLUINDO, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO, ADEQUAÇÃO A UM FIM ESPECÍFICO E NÃO VIOLAÇÃO. EM NENHUMA HIPÓTESE OS AUTORES OU DETENTORES DOS DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUAISQUER REIVINDICAÇÕES, DANOS OU OUTRAS RESPONSABILIDADES, SEJA EM AÇÃO CONTRATUAL, EXTRACONTRATUAL OU DE OUTRA NATUREZA, DECORRENTES DE, OU RELACIONADAS COM, O SOFTWARE OU O USO OU OUTRAS NEGOCIAÇÕES COM O SOFTWARE.
