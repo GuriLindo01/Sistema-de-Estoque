@@ -1,7 +1,7 @@
 import sqlite3
 from database.conexao import conectar
 
-def funcaocadastro(usuario, senha, cargo):
+def funcao_cadastro(usuario, senha, cargo):
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -14,7 +14,7 @@ def funcaocadastro(usuario, senha, cargo):
     finally:
         conexao.close()
 
-def funcaologin(usuario, senha):
+def funcao_login(usuario, senha):
     conexao = conectar()
     cursor = conexao.cursor()
 
