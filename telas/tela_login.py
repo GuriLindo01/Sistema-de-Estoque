@@ -48,7 +48,7 @@ class TelaAutenticacao(ctk.CTkFrame):
         self.login_imagem_logo = ctk.CTkLabel(self.painel_login, image=self.imagem_caixa, text="")
         self.login_imagem_logo.pack(pady=(40, 20))
 
-        self.login_texto_inicial = ctk.CTkLabel(self.painel_login, text="Bem-vindo ao Sistema!", font=("Arial", 24, "bold"), text_color=self.cor_texto_principal)
+        self.login_texto_inicial = ctk.CTkLabel(self.painel_login, text="Bem-vindo ao StockDesk!", font=("Arial", 24, "bold"), text_color=self.cor_texto_principal)
         self.login_texto_inicial.pack(pady=(0, 25))
 
         self.login_texto_usuario = ctk.CTkLabel(self.painel_login, text=" Usuário", font=("Arial", 14, "bold"), text_color=self.cor_texto_secundario, image=self.imagem_usuario, compound="left")

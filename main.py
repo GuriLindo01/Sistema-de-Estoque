@@ -16,54 +16,56 @@ class App(ctk.CTk):
 
         self.after(0, lambda: self.state("zoomed"))
 
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.painel_aberto = None
+
         self.login = TelaAutenticacao(master = self, controller = self)
         self.vendas = TelaVendas(master = self, controller = self)
         self.estoque = TelaEstoque(master = self, controller = self)
         self.historico = TelaHistorico(master = self, controller = self)
+
+        for tela in (self.login, self.vendas, self.estoque, self.historico):
+            tela.grid(row=0, column=0, sticky="nsew")
 
         self.verificar_sessao()
 
     def verificar_sessao(self):
         if os.path.exists("sessao.json"):
             try:
-                with open("sessao.json", "r", encoding="utf-8") as f:
-                    dados = json.load(f)
+                with open("sessao.json", "r", encoding="utf-8") as login:
+                    dados = json.load(login)
                     if dados.get("logado") is True:
-
                         usuario = dados.get("usuario", "Usuario")
                         cargo = dados.get("cargo", "Vendedor")
-                        self.abrir_estoque(cargo, usuario)
+                        self.abrir_vendas(cargo, usuario)
                         return
             except Exception:
                 pass
         self.abrir_login()
 
+    def mostrar_painel(self, frame):
+        if self.painel_aberto is not None and self.painel_aberto.winfo_exists():
+            self.painel_aberto.place_forget()
+        self.painel_aberto = frame
+        frame.tkraise()
+
     def abrir_vendas(self, cargo, usuario):
-        self.login.pack_forget()
-        self.estoque.pack_forget()
-        self.historico.pack_forget()
         self.vendas.menu.atualizar_informacoes(cargo, usuario)
-        self.vendas.pack(fill="both", expand=True)
+        self.vendas.tkraise()
 
     def abrir_estoque(self, cargo, usuario):
-        self.login.pack_forget()
-        self.vendas.pack_forget()
-        self.historico.pack_forget()
         self.estoque.menu.atualizar_informacoes(cargo, usuario)
-        self.estoque.pack(fill="both", expand=True)
+        self.estoque.definir_cargo(cargo)
+        self.estoque.tkraise()
 
     def abrir_historico(self, cargo, usuario):
-        self.login.pack_forget()
-        self.vendas.pack_forget()
-        self.estoque.pack_forget()
         self.historico.menu.atualizar_informacoes(cargo, usuario)
-        self.historico.pack(fill="both", expand=True)
+        self.historico.tkraise()
 
     def abrir_login(self):
-        self.estoque.pack_forget()
-        self.vendas.pack_forget()
-        self.historico.pack_forget()
-        self.login.pack(fill="both", expand=True)
+        self.login.tkraise()
 
     def deslogar(self):
         if os.path.exists("sessao.json"):

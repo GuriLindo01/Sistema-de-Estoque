@@ -16,8 +16,8 @@ def criar_tabelas():
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
-            descricao TEXT, 
-            categoria TEXT,
+            categoria TEXT, 
+            descricao TEXT,
             quantidade INTEGER NOT NULL DEFAULT 0,
             preco_compra REAL NOT NULL,
             preco_venda REAL NOT NULL,

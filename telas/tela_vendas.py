@@ -67,7 +67,7 @@ class MenuPrincipal(ctk.CTkFrame):
         self.informacoes_menu = ctk.CTkFrame(self.frame_menu, fg_color="transparent")
         self.informacoes_menu.pack(side="left", padx=(0, 30), pady=15, anchor="w")
                     
-        self.nome_aplicativo = ctk.CTkLabel(self.informacoes_menu, text="Sistema de Estoque", text_color=self.cor_fundo,font=ctk.CTkFont(size=18, weight="bold"))
+        self.nome_aplicativo = ctk.CTkLabel(self.informacoes_menu, text="StockDesk", text_color=self.cor_fundo,font=ctk.CTkFont(size=18, weight="bold"))
         self.nome_aplicativo.pack(anchor="w")
         
         self.informacoes_conta = ctk.CTkLabel(self.informacoes_menu, text=f"{self.usuario}, {self.cargo}", text_color=self.cor_cards, font=("Arial", 12))
@@ -149,10 +149,12 @@ class MenuPrincipal(ctk.CTkFrame):
         
     def abrir_painel_desconectar(self):
         self.frame_desconectar.place(rely=0.5, relx=0.5, anchor="center")
+        self.controller.mostrar_painel(self.frame_desconectar)
         
     def abrir_painel_sair(self):
         self.frame_sair.place(rely=0.5, relx=0.5, anchor="center")
-        
+        self.controller.mostrar_painel(self.frame_sair)
+
     def abrir_estoque(self):
         self.controller.abrir_estoque(self.usuario, self.cargo)
 
