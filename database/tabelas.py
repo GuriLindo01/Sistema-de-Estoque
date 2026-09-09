@@ -21,7 +21,7 @@ def criar_tabelas():
             quantidade INTEGER NOT NULL DEFAULT 0,
             preco_compra REAL NOT NULL,
             preco_venda REAL NOT NULL,
-            status TEXT NOT NULL DEFAULT 'Ativo' 
+            status TEXT NOT NULL DEFAULT 'Disponível' 
         )
     ''')
     cursor.execute('''

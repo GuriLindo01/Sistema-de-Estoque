@@ -57,7 +57,7 @@ class App(ctk.CTk):
 
     def abrir_estoque(self, cargo, usuario):
         self.estoque.menu.atualizar_informacoes(cargo, usuario)
-        self.estoque.definir_cargo(cargo)
+        self.estoque.configurar_cargo(cargo)
         self.estoque.tkraise()
 
     def abrir_historico(self, cargo, usuario):

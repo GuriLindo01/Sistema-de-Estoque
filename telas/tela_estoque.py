@@ -23,7 +23,7 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.configure(fg_color=self.cor_fundo)
 
-        self.carregar_imagens()
+        self.configurar_imagens()
 
         self.menu = MenuPrincipal(self, controller, usuario, cargo)
         self.menu.pack(side="top", fill="x")
@@ -33,8 +33,7 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.criar_cabecalho_tabela()
         self.criar_container_produtos()
-
-    def definir_cargo(self, cargo):
+    def configurar_cargo(self, cargo):
         self.cargo = cargo
         self.cargo_gerente = cargo == "Gerente"
 
@@ -45,16 +44,29 @@ class TelaEstoque(ctk.CTkFrame):
             self.botao_configurar.pack_forget()
             self.botao_adicionar.grid_remove()
 
-        self.atualizar_lista()
+        self.atualizar_lista_produtos()
+    
+    #Configurações da Tela
 
-    def criar_container_produtos(self):
-        self.container_produtos = ctk.CTkScrollableFrame(self.frame_conteudo, fg_color="transparent", corner_radius=0, border_width=0)
-        self.container_produtos.pack(fill="both", expand=True, pady=(8, 0), padx=0)
-        self.container_produtos._scrollbar.grid_forget()
-
-        self.atualizar_lista()
-
-    def configurar_colunas_tabela(self, frame):
+    def configurar_imagens(self):
+        try:
+            self.imagem_lixeira = ctk.CTkImage(Image.open("imagens/lixeira.png"), size=(15, 15))
+            self.imagem_editar = ctk.CTkImage(Image.open("imagens/editar.png"), size=(15, 15))
+            self.imagem_x = ctk.CTkImage(Image.open("imagens/x.png"), size=(19, 19))
+            self.circulo_verde = ctk.CTkImage(Image.open("imagens/circulo_verde.png"), size=(14, 14))
+            self.circulo_amarelo = ctk.CTkImage(Image.open("imagens/circulo_amarelo.png"), size=(14, 14))
+            self.circulo_vermelho = ctk.CTkImage(Image.open("imagens/circulo_vermelho.png"), size=(14, 14))
+            self.imagem_configuracoes = ctk.CTkImage(Image.open("imagens/engrenagem.png"), size=(17, 17))
+    
+        except Exception:
+            self.imagem_lixeira = None
+            self.imagem_editar = None
+            self.imagem_x = None
+            self.circulo_verde = None
+            self.circulo_amarelo = None
+            self.circulo_vermelho = None
+            self.imagem_configuracoes = None
+    def criar_colunas_tabela(self, frame):
         frame.grid_columnconfigure(0, weight=1, minsize=70)
         frame.grid_columnconfigure(1, weight=1, minsize=70)
         frame.grid_columnconfigure(2, weight=1, minsize=180)
@@ -68,6 +80,83 @@ class TelaEstoque(ctk.CTkFrame):
             frame.grid_columnconfigure(9, weight=1, minsize=120)
         else:
             frame.grid_columnconfigure(9, weight=0, minsize=0)
+    def criar_container_produtos(self):
+        self.container_produtos = ctk.CTkScrollableFrame(self.frame_conteudo, fg_color="transparent", corner_radius=0, border_width=0)
+        self.container_produtos.pack(fill="both", expand=True, pady=(8, 0), padx=0)
+        self.container_produtos._scrollbar.grid_forget()
+
+        self.atualizar_lista_produtos()
+        
+    #Configurações do Estoque
+
+    def atualizar_lista_produtos(self):
+        for widget in self.container_produtos.winfo_children():
+            widget.destroy()
+
+        aceitavel, razoavel, baixa = self.carregar_configuracao_quantidade()
+        for produto in produtos.ver_produtos():
+            self.criar_linha_produto(produto, aceitavel, razoavel, baixa)
+    def carregar_configuracao_quantidade(self):
+        aceitavel, razoavel, baixa = 100, 50, 10
+
+        if os.path.exists("configuracao.json"):
+            try:
+                with open("configuracao.json", "r", encoding="utf-8") as arquivo:
+                    dados = json.load(arquivo)
+                    if dados.get("configuracao") is True:
+                        aceitavel = dados.get("aceitavel", aceitavel)
+                        razoavel = dados.get("razoavel", razoavel)
+                        baixa = dados.get("baixa", baixa)
+            except Exception:
+                pass
+
+        return int(aceitavel), int(razoavel), int(baixa)
+
+    #Validações
+
+    def destacar_erro(self, entry):
+        entry.delete(0, "end")
+        entry.configure(border_color="red", placeholder_text_color="red")
+        entry.after(3000, lambda: entry.configure(border_color="gray", placeholder_text_color="gray"))
+    def preco_float(self, valor_str):
+        return float(valor_str.replace(',', '.'))
+    def validar_produto(self, nome, categoria, descricao, quantidade, preco_compra, preco_venda):
+        if not nome or not categoria or not descricao or not quantidade or not preco_compra or not preco_venda:
+            return False, "Preencha todos os campos.", None
+
+        if len(nome) < 3 or len(nome) > 20:
+            return False, "O nome do produto deve ter entre 3 e 20 caracteres.", "nome"
+
+        if len(categoria) < 3 or len(categoria) > 15:
+            return False, "A categoria do produto deve ter entre 3 e 15 caracteres.", "categoria"
+
+        if len(descricao) > 25:
+            return False, "A descrição do produto deve ter no máximo 25 caracteres.", "descricao"
+
+        if len(quantidade) < 1 or len(quantidade) > 6:
+            return False, "A quantidade do produto deve ter entre 1 e 6 caracteres.", "quantidade"
+
+        if len(preco_compra) < 1 or len(preco_compra) > 10:
+            return False, "O preço de compra do produto deve ter entre 1 e 10 caracteres.", "preco_compra"
+
+        if len(preco_venda) < 1 or len(preco_venda) > 10:
+            return False, "O preço de venda do produto deve ter entre 1 e 10 caracteres.", "preco_venda"
+
+        if not quantidade.isdigit():
+            return False, "A quantidade do produto deve ser um número.", "quantidade"
+
+        if not preco_compra.replace(',', '.').replace('.', '', 1).isdigit():
+            return False, "O preço de compra do produto deve ser um número.", "preco_compra"
+
+        if not preco_venda.replace(',', '.').replace('.', '', 1).isdigit():
+            return False, "O preço de venda do produto deve ser um número.", "preco_venda"
+
+        if self.preco_float(preco_compra) < 0 or self.preco_float(preco_venda) < 0:
+            return False, "Preço de compra e preço de venda devem ser maiores ou iguais a zero.", None
+
+        return True, "", None
+
+    #Criação da Tela
 
     def criar_cabecalho_tabela(self):
         self.frame_topo = ctk.CTkFrame(self.frame_conteudo, fg_color="transparent")
@@ -76,13 +165,13 @@ class TelaEstoque(ctk.CTkFrame):
         self.titulo_estoque = ctk.CTkLabel(self.frame_topo, text="Lista de Produtos em Estoque", font=("Arial", 20, "bold"), text_color=self.cor_texto_principal)
         self.titulo_estoque.pack(side="left")
 
-        self.botao_configurar = ctk.CTkButton(self.frame_topo, fg_color="transparent", text="", image=self.imagem_configuracoes, height=20, width=20, hover_color=self.cor_cards, command=self.abrir_configuracao)
+        self.botao_configurar = ctk.CTkButton(self.frame_topo, fg_color="transparent", text="", image=self.imagem_configuracoes, height=20, width=20, hover_color=self.cor_cards, command=self.tela_configuracao)
 
         self.frame_header = ctk.CTkFrame(self.frame_conteudo, height=40, fg_color=self.cor_cards, corner_radius=6, border_width=1, border_color=self.cor_bordas)
         self.frame_header.pack(fill="x", pady=(0, 10))
         self.frame_header.pack_propagate(False)
 
-        self.configurar_colunas_tabela(self.frame_header)
+        self.criar_colunas_tabela(self.frame_header)
 
         self.aviso_header = ctk.CTkLabel(self.frame_header, text="Inf.", font=("Arial", 12, "bold"), text_color=self.cor_texto_secundario, anchor="center")
         self.aviso_header.grid(row=0, column=0, sticky="nsew", pady=5)
@@ -111,11 +200,10 @@ class TelaEstoque(ctk.CTkFrame):
         self.status_header = ctk.CTkLabel(self.frame_header, text="Status", font=("Arial", 12, "bold"), text_color=self.cor_texto_secundario, anchor="center")
         self.status_header.grid(row=0, column=8, sticky="nsew", pady=5)
 
-        self.botao_adicionar = ctk.CTkButton(self.frame_header, text="+ Adicionar", width=120, height=30, font=("Arial", 12, "bold"), fg_color=self.cor_primaria, command=self.abrir_cadastro)
+        self.botao_adicionar = ctk.CTkButton(self.frame_header, text="+ Adicionar", width=120, height=30, font=("Arial", 12, "bold"), fg_color=self.cor_primaria, command=self.tela_cadastro)
 
         if self.cargo_gerente:
             self.botao_adicionar.grid(row=0, column=9, sticky="e", pady=5, padx=5)
-
     def criar_linha_produto(self, produto, aceitavel, razoavel, baixa):
         produto_id, nome, descricao, categoria, quantidade, preco_compra, preco_venda, status = produto
 
@@ -123,7 +211,7 @@ class TelaEstoque(ctk.CTkFrame):
         self.card.pack(fill="x", pady=(0, 5))
         self.card.pack_propagate(False)
 
-        self.configurar_colunas_tabela(self.card)
+        self.criar_colunas_tabela(self.card)
 
         if quantidade >= razoavel:
             imagem_aviso = self.circulo_verde
@@ -156,44 +244,25 @@ class TelaEstoque(ctk.CTkFrame):
         self.preco_venda_produto = ctk.CTkLabel(self.card, text=f"R$ {preco_venda:.2f}", text_color=self.cor_texto_secundario, font=("Arial", 12), anchor="center")
         self.preco_venda_produto.grid(row=0, column=7, sticky="nsew", pady=5)
 
-        self.status_produto = ctk.CTkLabel(self.card, text=status, text_color=self.cor_texto_secundario, font=("Arial", 12, "bold"), anchor="center")
+        self.status_produto = ctk.CTkLabel(self.card, text="Ativo", text_color=self.cor_texto_secundario, font=("Arial", 12, "bold"), anchor="center")
         self.status_produto.grid(row=0, column=8, sticky="nsew", pady=5)
 
         self.frame_acoes = ctk.CTkFrame(self.card, fg_color="transparent", corner_radius=0)
         
-        self.botao_excluir = ctk.CTkButton(self.frame_acoes, text="", image=self.imagem_lixeira, width=35, height=35, corner_radius=6, fg_color="#DC2626", hover_color="#B91C1C", command=lambda id_produto=produto_id: self.menu_excluir(id_produto))
-        self.botao_editar = ctk.CTkButton(self.frame_acoes, text="", image=self.imagem_editar, width=35, height=35, corner_radius=6, fg_color=self.cor_primaria, hover_color="#00477F", command=lambda id_produto=produto_id: self.abrir_edicao(id_produto))
+        self.botao_excluir = ctk.CTkButton(self.frame_acoes, text="", image=self.imagem_lixeira, width=35, height=35, corner_radius=6, fg_color="#DC2626", hover_color="#B91C1C", command=lambda id_produto=produto_id: self.tela_excluir(id_produto))
+        self.botao_editar = ctk.CTkButton(self.frame_acoes, text="", image=self.imagem_editar, width=35, height=35, corner_radius=6, fg_color=self.cor_primaria, hover_color="#00477F", command=lambda id_produto=produto_id: self.tela_edicao(id_produto))
 
         if self.cargo_gerente:
             self.frame_acoes.grid(row=0, column=9, sticky="nsew", pady=5)
             self.botao_excluir.pack(side="right", padx=(0, 27), pady=5)
             self.botao_editar.pack(side="right", padx=5, pady=5)
 
-    def atualizar_lista(self):
-        for widget in self.container_produtos.winfo_children():
-            widget.destroy()
+        if quantidade == 0:
+            self.status_produto.configure(text="Indisponível", text_color="#DC2626")
 
-        aceitavel, razoavel, baixa = self.carregar_configuracao()
-        for produto in produtos.ver_produtos():
-            self.criar_linha_produto(produto, aceitavel, razoavel, baixa)
+    #Configurações de Quantidade
 
-    def carregar_configuracao(self):
-        aceitavel, razoavel, baixa = 100, 50, 10
-
-        if os.path.exists("configuracao.json"):
-            try:
-                with open("configuracao.json", "r", encoding="utf-8") as arquivo:
-                    dados = json.load(arquivo)
-                    if dados.get("configuracao") is True:
-                        aceitavel = dados.get("aceitavel", aceitavel)
-                        razoavel = dados.get("razoavel", razoavel)
-                        baixa = dados.get("baixa", baixa)
-            except Exception:
-                pass
-
-        return int(aceitavel), int(razoavel), int(baixa)
-
-    def abrir_configuracao(self):
+    def tela_configuracao(self):
         if hasattr(self, "frame_configurar") and self.frame_configurar.winfo_exists():
             self.frame_configurar.destroy()
 
@@ -256,23 +325,17 @@ class TelaEstoque(ctk.CTkFrame):
         self.label_mensagem = ctk.CTkLabel(self.frame_configurar, text="", font=("Arial", 14))
         self.label_mensagem.pack(pady=(0, 10))
 
-        self.botao_confirmacao = ctk.CTkButton(self.frame_configurar, fg_color=self.cor_primaria, corner_radius=5, text="Confirmar", height=30, width=203, command=self.configurar)
+        self.botao_confirmacao = ctk.CTkButton(self.frame_configurar, fg_color=self.cor_primaria, corner_radius=5, text="Confirmar", height=30, width=203, command=self.configurar_quantidades)
         self.botao_confirmacao.pack(side="left", anchor="sw", padx=(8, 0), pady=8)
 
         self.botao_cancelar = ctk.CTkButton(self.frame_configurar, fg_color="transparent", corner_radius=5, border_width=2, border_color=self.cor_primaria, text="Cancelar", text_color=self.cor_primaria, height=30, hover_color=self.cor_fundo, width=203, command=self.frame_configurar.place_forget)
         self.botao_cancelar.pack(side="right", anchor="sw", padx=(0, 8), pady=8)
 
-        aceitavel, razoavel, baixa = self.carregar_configuracao()
+        aceitavel, razoavel, baixa = self.carregar_configuracao_quantidade()
         self.input1.insert(0, str(aceitavel))
         self.input2.insert(0, str(razoavel))
         self.input3.insert(0, str(baixa))
-
-    def destacar_erro(self, entry):
-        entry.delete(0, "end")
-        entry.configure(border_color="red", placeholder_text_color="red")
-        entry.after(3000, lambda: entry.configure(border_color="gray", placeholder_text_color="gray"))
-
-    def configurar(self):
+    def configurar_quantidades(self):
         aceitavel = self.input1.get()
         razoavel = self.input2.get()
         baixa = self.input3.get()
@@ -307,8 +370,7 @@ class TelaEstoque(ctk.CTkFrame):
         else:
             self.salvar_configuracao(aceitavel, razoavel, baixa)
             self.frame_configurar.place_forget()
-            self.atualizar_lista()
-
+            self.atualizar_lista_produtos()
     def salvar_configuracao(self, aceitavel, razoavel, baixa):
         if os.path.exists("configuracao.json"):
             os.remove("configuracao.json")
@@ -317,46 +379,9 @@ class TelaEstoque(ctk.CTkFrame):
         with open("configuracao.json", "w", encoding="utf-8") as nova_configuracao:
             json.dump(configuracoes, nova_configuracao, indent=4)
 
-    def preco_float(self, valor_str):
-        return float(valor_str.replace(',', '.'))
+    #Cadastro de Produtos
 
-    def validar_produto(self, nome, categoria, descricao, quantidade, preco_compra, preco_venda):
-        if not nome or not categoria or not descricao or not quantidade or not preco_compra or not preco_venda:
-            return False, "Preencha todos os campos.", None
-
-        if len(nome) < 3 or len(nome) > 20:
-            return False, "O nome do produto deve ter entre 3 e 20 caracteres.", "nome"
-
-        if len(categoria) < 3 or len(categoria) > 15:
-            return False, "A categoria do produto deve ter entre 3 e 15 caracteres.", "categoria"
-
-        if len(descricao) > 25:
-            return False, "A descrição do produto deve ter no máximo 25 caracteres.", "descricao"
-
-        if len(quantidade) < 1 or len(quantidade) > 6:
-            return False, "A quantidade do produto deve ter entre 1 e 6 caracteres.", "quantidade"
-
-        if len(preco_compra) < 1 or len(preco_compra) > 10:
-            return False, "O preço de compra do produto deve ter entre 1 e 10 caracteres.", "preco_compra"
-
-        if len(preco_venda) < 1 or len(preco_venda) > 10:
-            return False, "O preço de venda do produto deve ter entre 1 e 10 caracteres.", "preco_venda"
-
-        if not quantidade.isdigit():
-            return False, "A quantidade do produto deve ser um número.", "quantidade"
-
-        if not preco_compra.replace(',', '.').replace('.', '', 1).isdigit():
-            return False, "O preço de compra do produto deve ser um número.", "preco_compra"
-
-        if not preco_venda.replace(',', '.').replace('.', '', 1).isdigit():
-            return False, "O preço de venda do produto deve ser um número.", "preco_venda"
-
-        if self.preco_float(preco_compra) < 0 or self.preco_float(preco_venda) < 0:
-            return False, "Preço de compra e preço de venda devem ser maiores ou iguais a zero.", None
-
-        return True, "", None
-
-    def abrir_cadastro(self):
+    def tela_cadastro(self):
         if hasattr(self, "frame_cadastro") and self.frame_cadastro.winfo_exists():
             self.frame_cadastro.destroy()
 
@@ -439,7 +464,6 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.botao_cancelar = ctk.CTkButton(self.frame_cadastro, text="Cancelar", width=615, height=30, font=("Arial", 12, "bold"), fg_color="transparent", border_width=2, border_color=self.cor_primaria, text_color=self.cor_primaria, hover_color=self.cor_fundo, command=self.frame_cadastro.place_forget)
         self.botao_cancelar.pack(pady=(0, 5), padx=(0, 5), side="right", anchor="se")
-
     def cadastrar_produto(self):
         nome = self.cadastro_nome.get()
         categoria = self.cadastro_categoria.get()
@@ -460,9 +484,11 @@ class TelaEstoque(ctk.CTkFrame):
 
         produtos.adicionar_produto(nome, categoria, descricao, quantidade, self.preco_float(preco_compra), self.preco_float(preco_venda))
         self.frame_cadastro.place_forget()
-        self.atualizar_lista()
+        self.atualizar_lista_produtos()
 
-    def abrir_edicao(self, id_produto):
+    #Edição de Produtos
+
+    def tela_edicao(self, id_produto):
         if hasattr(self, "frame_editar") and self.frame_editar.winfo_exists():
             self.frame_editar.destroy()
 
@@ -556,7 +582,6 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.botao_cancelar = ctk.CTkButton(self.frame_editar, text="Cancelar", width=615, height=30, font=("Arial", 12, "bold"), fg_color="transparent", border_width=2, border_color=self.cor_primaria, text_color=self.cor_primaria, hover_color=self.cor_fundo, command=self.frame_editar.place_forget)
         self.botao_cancelar.pack(pady=(0, 5), padx=(0, 5), side="right", anchor="se")
-
     def editar_produto(self, id_produto):
         nome = self.editar_nome.get()
         categoria = self.editar_categoria.get()
@@ -577,9 +602,11 @@ class TelaEstoque(ctk.CTkFrame):
 
         produtos.editar_produto(id_produto, nome, categoria, descricao, quantidade, self.preco_float(preco_compra), self.preco_float(preco_venda))
         self.frame_editar.place_forget()
-        self.atualizar_lista()
+        self.atualizar_lista_produtos()
 
-    def menu_excluir(self, id_produto):
+    #Exclusão de Produtos
+
+    def tela_excluir(self, id_produto):
         if hasattr(self, "frame_excluir") and self.frame_excluir.winfo_exists():
             self.frame_excluir.destroy()
 
@@ -605,30 +632,10 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.botao_cancelar = ctk.CTkButton(self.frame_excluir, fg_color="transparent", corner_radius=5, border_width=2, border_color=self.cor_primaria, text="Cancelar", text_color=self.cor_primaria, height=30, hover_color=self.cor_fundo, command=self.frame_excluir.place_forget)
         self.botao_cancelar.pack(side="left", anchor="se", padx=(0, 8), pady=8)
-
     def excluir(self, id_produto):
         produtos.excluir_produto(id_produto)
         self.frame_excluir.place_forget()
-        self.atualizar_lista()
-
-    def carregar_imagens(self):
-        try:
-            self.imagem_lixeira = ctk.CTkImage(Image.open("imagens/lixeira.png"), size=(15, 15))
-            self.imagem_editar = ctk.CTkImage(Image.open("imagens/editar.png"), size=(15, 15))
-            self.imagem_x = ctk.CTkImage(Image.open("imagens/x.png"), size=(19, 19))
-            self.circulo_verde = ctk.CTkImage(Image.open("imagens/circulo_verde.png"), size=(14, 14))
-            self.circulo_amarelo = ctk.CTkImage(Image.open("imagens/circulo_amarelo.png"), size=(14, 14))
-            self.circulo_vermelho = ctk.CTkImage(Image.open("imagens/circulo_vermelho.png"), size=(14, 14))
-            self.imagem_configuracoes = ctk.CTkImage(Image.open("imagens/engrenagem.png"), size=(17, 17))
-
-        except Exception:
-            self.imagem_lixeira = None
-            self.imagem_editar = None
-            self.imagem_x = None
-            self.circulo_verde = None
-            self.circulo_amarelo = None
-            self.circulo_vermelho = None
-            self.imagem_configuracoes = None
+        self.atualizar_lista_produtos()
 
 class MenuPrincipal(ctk.CTkFrame):
     def __init__(self, master, controller, usuario="Usuário", cargo="Vendedor"):
@@ -655,6 +662,8 @@ class MenuPrincipal(ctk.CTkFrame):
         self.menu_desconectar()
         self.frame_desconectar.place_forget()
 
+    #Menus
+
     def menu_topo(self):
         self.frame_menu = ctk.CTkFrame(self, fg_color=self.cor_primaria, height=80, corner_radius=0)
         self.frame_menu.pack(pady=0, padx=0, fill="x", anchor="n")
@@ -666,10 +675,10 @@ class MenuPrincipal(ctk.CTkFrame):
         self.container_botoes_menu = ctk.CTkFrame(self.frame_menu, fg_color="transparent")
         self.container_botoes_menu.pack(padx=(30, 20), anchor="e", side="right")
 
-        self.botao_desconectar = ctk.CTkButton(self.container_botoes_menu, width=15, height=20, border_width=1, corner_radius=50, border_color=self.cor_bordas, text="", fg_color="transparent", image=self.imagem_usuario_config, command=self.abrir_painel_desconectar)
+        self.botao_desconectar = ctk.CTkButton(self.container_botoes_menu, width=15, height=20, border_width=1, corner_radius=50, border_color=self.cor_bordas, text="", fg_color="transparent", image=self.imagem_usuario_config, command=self.menu_desconectar)
         self.botao_desconectar.pack(pady=(0, 8))
 
-        self.botao_sair = ctk.CTkButton(self.container_botoes_menu, width=15, height=20, border_width=1, corner_radius=50, border_color=self.cor_bordas, text="", fg_color="transparent", image=self.imagem_sair, command=self.abrir_painel_sair)
+        self.botao_sair = ctk.CTkButton(self.container_botoes_menu, width=15, height=20, border_width=1, corner_radius=50, border_color=self.cor_bordas, text="", fg_color="transparent", image=self.imagem_sair, command=self.menu_sair)
         self.botao_sair.pack()
 
         self.informacoes_menu = ctk.CTkFrame(self.frame_menu, fg_color="transparent")
@@ -704,11 +713,14 @@ class MenuPrincipal(ctk.CTkFrame):
 
         self.destaque_historico = ctk.CTkFrame(self.container_destaques, fg_color=self.cor_fundo, height=3)
         self.destaque_historico.pack(side="left", padx=0, pady=0, expand=True, fill="x")
-
     def menu_desconectar(self):
+        if hasattr(self, "frame_desconectar") and self.frame_desconectar.winfo_exists():
+            self.frame_desconectar.destroy()
+
         self.frame_desconectar = ctk.CTkFrame(self.winfo_toplevel(), fg_color=self.cor_cards, height=150, width=300, corner_radius=5)
         self.frame_desconectar.place(rely=0.5, relx=0.5, anchor="center")
         self.frame_desconectar.pack_propagate(False)
+        self.controller.mostrar_painel(self.frame_desconectar)
 
         self.container_fechar = ctk.CTkFrame(self.frame_desconectar, fg_color=self.cor_primaria, height=30, corner_radius=5)
         self.container_fechar.pack(side="top", fill="x", pady=0)
@@ -727,15 +739,14 @@ class MenuPrincipal(ctk.CTkFrame):
 
         self.botao_cancelar = ctk.CTkButton(self.frame_desconectar, fg_color="transparent", corner_radius=5, border_width=2, border_color=self.cor_primaria, text="Cancelar", text_color=self.cor_primaria, height=30, hover_color=self.cor_fundo, command=self.frame_desconectar.place_forget)
         self.botao_cancelar.pack(side="left", anchor="se", padx=(0, 8), pady=8)
-
-    def desconectar(self):
-        self.frame_desconectar.place_forget()
-        self.controller.deslogar()
-
     def menu_sair(self):
+        if hasattr(self, "frame_sair") and self.frame_sair.winfo_exists():
+            self.frame_sair.destroy()
+
         self.frame_sair = ctk.CTkFrame(self.winfo_toplevel(), fg_color=self.cor_cards, height=150, width=300, corner_radius=5)
         self.frame_sair.place(rely=0.5, relx=0.5, anchor="center")
         self.frame_sair.pack_propagate(False)
+        self.controller.mostrar_painel(self.frame_sair)
 
         self.container_fechar = ctk.CTkFrame(self.frame_sair, fg_color=self.cor_primaria, height=30, corner_radius=5)
         self.container_fechar.pack(side="top", fill="x", pady=0)
@@ -755,20 +766,11 @@ class MenuPrincipal(ctk.CTkFrame):
         self.botao_cancelar = ctk.CTkButton(self.frame_sair, fg_color="transparent", corner_radius=5, border_width=2, border_color=self.cor_primaria, text="Cancelar", text_color=self.cor_primaria, height=30, hover_color=self.cor_fundo, command=self.frame_sair.place_forget)
         self.botao_cancelar.pack(side="left", anchor="se", padx=(0, 8), pady=8)
 
-    def abrir_painel_desconectar(self):
-        self.frame_desconectar.place(rely=0.5, relx=0.5, anchor="center")
-        self.controller.mostrar_painel(self.frame_desconectar)
+    #Funções/Carregamento
 
-    def abrir_painel_sair(self):
-        self.frame_sair.place(rely=0.5, relx=0.5, anchor="center")
-        self.controller.mostrar_painel(self.frame_sair)
-
-    def abrir_vendas(self):
-        self.controller.abrir_vendas(self.usuario, self.cargo)
-
-    def abrir_historico(self):
-        self.controller.abrir_historico(self.usuario, self.cargo)
-
+    def desconectar(self):
+        self.frame_desconectar.place_forget()
+        self.controller.deslogar()
     def carregar_imagens(self):
         try:
             self.imagem_grafico = ctk.CTkImage(Image.open("imagens/grafico.png"), size=(15, 15))
@@ -787,8 +789,17 @@ class MenuPrincipal(ctk.CTkFrame):
             self.imagem_sair = None
             self.imagem_logo = None
             self.imagem_x = None
-
     def atualizar_informacoes(self, usuario, cargo):
         self.usuario = usuario
         self.cargo = cargo
         self.informacoes_conta.configure(text=f"{self.cargo}, {self.usuario}")
+
+    #Mudança de Telas
+
+    def abrir_vendas(self):
+        self.controller.abrir_vendas(self.usuario, self.cargo)
+    def abrir_historico(self):
+        self.controller.abrir_historico(self.usuario, self.cargo)
+
+
+
