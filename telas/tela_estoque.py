@@ -103,13 +103,12 @@ class TelaEstoque(ctk.CTkFrame):
             try:
                 with open("configuracao.json", "r", encoding="utf-8") as arquivo:
                     dados = json.load(arquivo)
-                    if dados.get("configuracao") is True:
+                    if dados.get("configurado") is True:
                         aceitavel = dados.get("aceitavel", aceitavel)
                         razoavel = dados.get("razoavel", razoavel)
                         baixa = dados.get("baixa", baixa)
             except Exception:
                 pass
-
         return int(aceitavel), int(razoavel), int(baixa)
 
     #Validações
@@ -124,14 +123,14 @@ class TelaEstoque(ctk.CTkFrame):
         if not nome or not categoria or not descricao or not quantidade or not preco_compra or not preco_venda:
             return False, "Preencha todos os campos.", None
 
-        if len(nome) < 3 or len(nome) > 20:
-            return False, "O nome do produto deve ter entre 3 e 20 caracteres.", "nome"
+        if len(nome) < 3 or len(nome) > 15:
+            return False, "O nome do produto deve ter entre 3 e 15 caracteres.", "nome"
 
         if len(categoria) < 3 or len(categoria) > 15:
             return False, "A categoria do produto deve ter entre 3 e 15 caracteres.", "categoria"
 
-        if len(descricao) > 25:
-            return False, "A descrição do produto deve ter no máximo 25 caracteres.", "descricao"
+        if len(descricao) > 20:
+            return False, "A descrição do produto deve ter no máximo 20 caracteres.", "descricao"
 
         if len(quantidade) < 1 or len(quantidade) > 6:
             return False, "A quantidade do produto deve ter entre 1 e 6 caracteres.", "quantidade"
@@ -213,9 +212,9 @@ class TelaEstoque(ctk.CTkFrame):
 
         self.criar_colunas_tabela(self.card)
 
-        if quantidade >= razoavel:
+        if quantidade > razoavel:
             imagem_aviso = self.circulo_verde
-        elif quantidade >= baixa:
+        elif quantidade > baixa:
             imagem_aviso = self.circulo_amarelo
         else:
             imagem_aviso = self.circulo_vermelho
@@ -257,7 +256,7 @@ class TelaEstoque(ctk.CTkFrame):
             self.botao_excluir.pack(side="right", padx=(0, 27), pady=5)
             self.botao_editar.pack(side="right", padx=5, pady=5)
 
-        if quantidade == 0:
+        if quantidade <= 0:
             self.status_produto.configure(text="Indisponível", text_color="#DC2626")
 
     #Configurações de Quantidade

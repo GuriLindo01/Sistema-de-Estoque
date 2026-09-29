@@ -53,6 +53,7 @@ class App(ctk.CTk):
 
     def abrir_vendas(self, cargo, usuario):
         self.vendas.menu.atualizar_informacoes(cargo, usuario)
+        self.vendas.atualizar_tela()
         self.vendas.tkraise()
 
     def abrir_estoque(self, cargo, usuario):
