@@ -31,7 +31,8 @@ def criar_tabelas():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             data_venda DATETIME DEFAULT CURRENT_TIMESTAMP,
             forma_pagamento TEXT NOT NULL,
-            desconto TEXT DEFAULT 0.0,
+            desconto TEXT,
+            subtotal REAL NOT NULL,
             valor_total REAL NOT NULL,
             lucro_total REAL NOT NULL
         )

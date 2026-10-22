@@ -61,20 +61,20 @@ class TelaVendas(ctk.CTkFrame):
         self.titulo_vendas = ctk.CTkLabel(self.frame_topo, text="Venda de Produtos", font=("Arial", 20, "bold"), text_color=self.cor_texto_principal)
         self.titulo_vendas.pack(side="left")
 
-        self.frame_esquerda = ctk.CTkFrame(self.frame_conteudo, width=500)
+        self.frame_esquerda = ctk.CTkFrame(self.frame_conteudo, width=400, fg_color=self.cor_cards)
         self.frame_esquerda.pack(side="left", fill="y", pady=(0, 10), padx=(0, 10))
         self.frame_esquerda.pack_propagate(False)
 
         self.label_itens_estoque = ctk.CTkLabel(self.frame_esquerda, text="Produtos em Estoque", font=("Arial", 16, "bold"))
         self.label_itens_estoque.pack(pady=(5, 0))
 
-        self.frame_direita = ctk.CTkFrame(self.frame_conteudo)
+        self.frame_direita = ctk.CTkFrame(self.frame_conteudo, fg_color=self.cor_cards)
         self.frame_direita.pack(expand=True, side="right", fill="both", pady=(0, 10))
 
         self.label_itens_carrinho = ctk.CTkLabel(self.frame_direita, text="Produtos no Carrinho", font=("Arial", 16, "bold"))
         self.label_itens_carrinho.pack(pady=(5, 0))
 
-        self.frame_produtos = ctk.CTkScrollableFrame(self.frame_esquerda)
+        self.frame_produtos = ctk.CTkScrollableFrame(self.frame_esquerda, fg_color=self.cor_fundo)
         self.frame_produtos.pack(side="top", pady= 10, padx=10, expand=True, fill="both")
 
         self.carregar_lista_produtos()
@@ -82,16 +82,16 @@ class TelaVendas(ctk.CTkFrame):
         self.botao_adicionar_carrinho = ctk.CTkButton(self.frame_esquerda, text="Adicionar produtos ao carrinho", command=self.adicionar_ao_carrinho)
         self.botao_adicionar_carrinho.pack(side="bottom", pady=(0, 10), padx=10, fill="x")
 
-        self.frame_carrinho = ctk.CTkScrollableFrame(self.frame_direita, height=50)
+        self.frame_carrinho = ctk.CTkScrollableFrame(self.frame_direita, height=50, fg_color=self.cor_fundo)
         self.frame_carrinho.pack(pady=10, padx=10, fill="x")
 
         self.container_venda = ctk.CTkFrame(self.frame_direita, fg_color="transparent")
         self.container_venda.pack(padx=10, pady=10, fill="x")
 
-        self.container_venda_inputs = ctk.CTkFrame(self.container_venda)
+        self.container_venda_inputs = ctk.CTkFrame(self.container_venda, fg_color=self.cor_fundo)
         self.container_venda_inputs.pack(side="left")
 
-        self.container_pagamento = ctk.CTkFrame(self.container_venda_inputs)
+        self.container_pagamento = ctk.CTkFrame(self.container_venda_inputs, fg_color="transparent")
         self.container_pagamento.pack(anchor="w", pady=5)
 
         self.venda_label_pagamento = ctk.CTkLabel(self.container_pagamento, text="Forma de Pagamento:", font=("Arial", 16, "bold"))
@@ -100,7 +100,7 @@ class TelaVendas(ctk.CTkFrame):
         self.venda_forma_pagamento = ctk.CTkOptionMenu(self.container_pagamento, values=["Dinheiro", "Cartão", "PIX", "Outro"])
         self.venda_forma_pagamento.pack(side="right", pady=5)
 
-        self.container_desconto = ctk.CTkFrame(self.container_venda_inputs)
+        self.container_desconto = ctk.CTkFrame(self.container_venda_inputs, fg_color="transparent")
         self.container_desconto.pack(anchor="w", pady=5)
 
         self.venda_label_desconto = ctk.CTkLabel(self.container_desconto, text="Desconto:", font=("Arial", 16, "bold"))
@@ -113,7 +113,7 @@ class TelaVendas(ctk.CTkFrame):
         self.tipo_desconto = ctk.CTkOptionMenu(self.container_desconto, values=["%", "R$"], width=40, command=lambda valor: self.calcular_prevenda())
         self.tipo_desconto.pack(side="right", padx=10)
 
-        self.container_prevenda = ctk.CTkFrame(self.container_venda)
+        self.container_prevenda = ctk.CTkFrame(self.container_venda, fg_color="transparent")
         self.container_prevenda.pack(side="right", padx=20)
 
         self.label_prevenda_total = ctk.CTkLabel(self.container_prevenda, text="Total da Venda: R$ 0.00", font=("Arial", 14))

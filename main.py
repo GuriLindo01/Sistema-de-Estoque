@@ -63,6 +63,7 @@ class App(ctk.CTk):
 
     def abrir_historico(self, cargo, usuario):
         self.historico.menu.atualizar_informacoes(cargo, usuario)
+        self.historico.configurar_cargo(cargo)
         self.historico.tkraise()
 
     def abrir_login(self):

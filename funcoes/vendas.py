@@ -1,8 +1,10 @@
 from database.conexao import conectar
 from funcoes.produtos import buscar_produto
+from datetime import datetime
 
 
 def registrar_venda(itens, forma_pagamento, desconto, tipo_desconto):
+    data = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     valor_total = 0
     lucro_total = 0
 
@@ -22,6 +24,9 @@ def registrar_venda(itens, forma_pagamento, desconto, tipo_desconto):
         valor_total = valor_total + subtotal
         lucro_total = lucro_total + lucro_item
 
+    # Guarda o valor ANTES do desconto, pra não precisar recalcular depois
+    subtotal_bruto = valor_total
+
     if tipo_desconto == "R$":
         valor_total = valor_total - desconto
         lucro_total = lucro_total - desconto
@@ -33,9 +38,9 @@ def registrar_venda(itens, forma_pagamento, desconto, tipo_desconto):
     cursor = conexao.cursor()
 
     cursor.execute('''
-        INSERT INTO vendas (forma_pagamento, desconto, valor_total, lucro_total)
-        VALUES (?, ?, ?, ?)
-    ''', (forma_pagamento, f"{tipo_desconto}{desconto}", valor_total, lucro_total))
+        INSERT INTO vendas (data_venda, forma_pagamento, desconto, subtotal, valor_total, lucro_total)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (data, forma_pagamento, f"{tipo_desconto}{desconto}", subtotal_bruto, valor_total, lucro_total))
 
     venda_id = cursor.lastrowid
 
@@ -62,6 +67,7 @@ def registrar_venda(itens, forma_pagamento, desconto, tipo_desconto):
 
     return True, venda_id
 
+
 def ver_vendas():
     conexao = conectar()
     cursor = conexao.cursor()
@@ -70,6 +76,7 @@ def ver_vendas():
     conexao.close()
     return vendas
 
+
 def ver_itens_venda(venda_id):
     conexao = conectar()
     cursor = conexao.cursor()
@@ -77,3 +84,31 @@ def ver_itens_venda(venda_id):
     itens = cursor.fetchall()
     conexao.close()
     return itens
+
+
+def reverter_venda(venda_id):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute('SELECT produto_id, quantidade FROM itens_venda WHERE venda_id = ?', (venda_id,))
+    itens = cursor.fetchall()
+
+    for produto_id, quantidade in itens:
+        cursor.execute('UPDATE produtos SET quantidade = quantidade + ? WHERE id = ?', (quantidade, produto_id))
+
+    cursor.execute('DELETE FROM itens_venda WHERE venda_id = ?', (venda_id,))
+    cursor.execute('DELETE FROM vendas WHERE id = ?', (venda_id,))
+
+    conexao.commit()
+    conexao.close()
+
+
+def excluir_venda(venda_id):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute('DELETE FROM itens_venda WHERE venda_id = ?', (venda_id,))
+    cursor.execute('DELETE FROM vendas WHERE id = ?', (venda_id,))
+
+    conexao.commit()
+    conexao.close()
