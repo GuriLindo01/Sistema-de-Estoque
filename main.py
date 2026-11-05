@@ -4,6 +4,7 @@ from telas.tela_estoque import TelaEstoque
 from telas.tela_historico import TelaHistorico
 import json
 import os
+import platform
 
 from database.tabelas import criar_tabelas
 import customtkinter as ctk
@@ -11,68 +12,73 @@ import customtkinter as ctk
 criar_tabelas()
 
 class App(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+   def __init__(self):
+       super().__init__()
 
-        self.after(0, lambda: self.state("zoomed"))
+       sistema = platform.system()
+       if sistema == "Linux":
+           self.after(0, lambda: self.attributes("-zoomed", True))
+       else:
+           self.after(0, lambda: self.state("zoomed"))
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+       self.grid_rowconfigure(0, weight=1)
+       self.grid_columnconfigure(0, weight=1)
 
-        self.painel_aberto = None
+       self.painel_aberto = None
 
-        self.login = TelaAutenticacao(master = self, controller = self)
-        self.vendas = TelaVendas(master = self, controller = self)
-        self.estoque = TelaEstoque(master = self, controller = self)
-        self.historico = TelaHistorico(master = self, controller = self)
+       self.login = TelaAutenticacao(master = self, controller = self)
+       self.vendas = TelaVendas(master = self, controller = self)
+       self.estoque = TelaEstoque(master = self, controller = self)
+       self.historico = TelaHistorico(master = self, controller = self)
 
-        for tela in (self.login, self.vendas, self.estoque, self.historico):
-            tela.grid(row=0, column=0, sticky="nsew")
+       for tela in (self.login, self.vendas, self.estoque, self.historico):
+           tela.grid(row=0, column=0, sticky="nsew")
 
-        self.verificar_sessao()
+       self.verificar_sessao()
 
-    def verificar_sessao(self):
-        if os.path.exists("sessao.json"):
-            try:
-                with open("sessao.json", "r", encoding="utf-8") as login:
-                    dados = json.load(login)
-                    if dados.get("logado") is True:
-                        usuario = dados.get("usuario", "Usuario")
-                        cargo = dados.get("cargo", "Vendedor")
-                        self.abrir_vendas(cargo, usuario)
-                        return
-            except Exception:
-                pass
-        self.abrir_login()
+   def verificar_sessao(self):
+       if os.path.exists("sessao.json"):
+           try:
+               with open("sessao.json", "r", encoding="utf-8") as login:
+                   dados = json.load(login)
+                   if dados.get("logado") is True:
+                       usuario = dados.get("usuario", "Usuario")
+                       cargo = dados.get("cargo", "Vendedor")
+                       self.abrir_vendas(cargo, usuario)
+                       return
+           except Exception:
+               pass
+       self.abrir_login()
 
-    def mostrar_painel(self, frame):
-        if self.painel_aberto is not None and self.painel_aberto.winfo_exists():
-            self.painel_aberto.place_forget()
-        self.painel_aberto = frame
-        frame.tkraise()
+   def mostrar_painel(self, frame):
+       if self.painel_aberto is not None and self.painel_aberto.winfo_exists():
+           self.painel_aberto.place_forget()
+       self.painel_aberto = frame
+       frame.tkraise()
 
-    def abrir_vendas(self, cargo, usuario):
-        self.vendas.menu.atualizar_informacoes(cargo, usuario)
-        self.vendas.atualizar_tela()
-        self.vendas.tkraise()
+   def abrir_vendas(self, cargo, usuario):
+       self.vendas.menu.atualizar_informacoes(cargo, usuario)
+       self.vendas.atualizar_tela()
+       self.vendas.tkraise()
 
-    def abrir_estoque(self, cargo, usuario):
-        self.estoque.menu.atualizar_informacoes(cargo, usuario)
-        self.estoque.configurar_cargo(cargo)
-        self.estoque.tkraise()
+   def abrir_estoque(self, cargo, usuario):
+       self.estoque.menu.atualizar_informacoes(cargo, usuario)
+       self.estoque.configurar_cargo(cargo)
+       self.estoque.tkraise()
 
-    def abrir_historico(self, cargo, usuario):
-        self.historico.menu.atualizar_informacoes(cargo, usuario)
-        self.historico.configurar_cargo(cargo)
-        self.historico.tkraise()
+   def abrir_historico(self, cargo, usuario):
+       self.historico.menu.atualizar_informacoes(cargo, usuario)
+       self.historico.configurar_cargo(cargo)
+       self.historico.tkraise()
 
-    def abrir_login(self):
-        self.login.tkraise()
+   def abrir_login(self):
+       self.login.tkraise()
 
-    def deslogar(self):
-        if os.path.exists("sessao.json"):
-            os.remove("sessao.json")
-        self.abrir_login()
+   def deslogar(self):
+       if os.path.exists("sessao.json"):
+           os.remove("sessao.json")
+       self.abrir_login()
 
 app = App()
 app.mainloop()
+

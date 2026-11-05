@@ -137,7 +137,7 @@ class TelaVendas(ctk.CTkFrame):
         for produto in produtos:
             id = produto[0]
             nome = produto[1]
-            descricao = produto[3]
+            descricao = produto[2]
             quantidade = produto[4]
 
             var_checkbox = ctk.BooleanVar(value=False)
@@ -316,6 +316,8 @@ class TelaVendas(ctk.CTkFrame):
 
         self.checkboxes_produtos = {}
         self.carrinho = []
+
+        self.venda_desconto.after(500, lambda: self.venda_desconto.configure(text="0"))
 
         self.carregar_lista_produtos()
         self.calcular_prevenda()

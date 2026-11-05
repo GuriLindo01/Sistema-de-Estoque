@@ -24,15 +24,15 @@ def registrar_venda(itens, forma_pagamento, desconto, tipo_desconto):
         valor_total = valor_total + subtotal
         lucro_total = lucro_total + lucro_item
 
-    # Guarda o valor ANTES do desconto, pra não precisar recalcular depois
     subtotal_bruto = valor_total
 
     if tipo_desconto == "R$":
-        valor_total = valor_total - desconto
-        lucro_total = lucro_total - desconto
+        valor_desconto = desconto
     else:
-        valor_total = valor_total - (valor_total * (desconto / 100))
-        lucro_total = lucro_total - (lucro_total * (desconto / 100))
+        valor_desconto = subtotal_bruto * (desconto / 100)
+
+    valor_total -= valor_desconto
+    lucro_total -= valor_desconto
 
     conexao = conectar()
     cursor = conexao.cursor()
